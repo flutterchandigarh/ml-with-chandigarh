@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "88795731141",
+    "project_id": "ml-with-chandigarh",
+    "storage_bucket": "ml-with-chandigarh.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:88795731141:android:b7aece3d4b8e018875ccac",
+        "android_client_info": {
+          "package_name": "com.example.ml_with_chandigarh"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "88795731141-2jb41j26k01jm0hud4d8l0cprc1qggq6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDba5Nisf9BXaeM2DIyyyU4iELjeBMDK5Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "88795731141-2jb41j26k01jm0hud4d8l0cprc1qggq6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

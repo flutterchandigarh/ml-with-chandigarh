@@ -15,18 +15,25 @@ class ImagePickerClass extends StatefulWidget {
 }
 
 class _ImagePickerClassState extends State<ImagePickerClass> {
-  File _pickedImage;
-  ImagePicker picker = ImagePicker();
-
-  void _pickImage(ImageSource imageSource) async {
-    final pickedImageFile = await picker.getImage(
-      source: imageSource,
-    );
-
+  File _image;
+  Future getImagefromCamera() async {
+    var image = ImagePicker();
+    await image
+        .getImage(source: ImageSource.camera)
+        .then((value) => _image = File(value.path));
     setState(() {
-      _pickedImage = File(pickedImageFile.path);
+      widget.imagePickFn(_image);
     });
-    widget.imagePickFn(File(pickedImageFile.path));
+  }
+
+  Future getImagefromGallery() async {
+    var image = ImagePicker();
+    await image
+        .getImage(source: ImageSource.gallery)
+        .then((value) => _image = File(value.path));
+    setState(() {
+      widget.imagePickFn(_image);
+    });
   }
 
   @override
@@ -34,83 +41,34 @@ class _ImagePickerClassState extends State<ImagePickerClass> {
     return Column(
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.all(18.0),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Container(
-              color: Colors.orangeAccent.withOpacity(0.3),
-              width: MediaQuery.of(context).size.width,
-              height: 300,
-              child: _pickedImage != null
-                  ? Image(
-                      image: FileImage(_pickedImage),
-                    )
-                  : Center(
-                      child: Text("Please Add Image"),
-                    ),
+          padding: const EdgeInsets.all(16.0),
+          child: Container(
+            width: double.infinity,
+            height: 300,
+            decoration: BoxDecoration(
+                color: Colors.blueAccent.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(22)),
+            child: Center(
+              child: _image == null
+                  ? Text("No Image is picked")
+                  : Image.file(_image),
             ),
           ),
         ),
-        SizedBox(
-          height: 10,
-        ),
-        FlatButton.icon(
-          onPressed: () {
-            showDialog(
-                context: context,
-                builder: (_) {
-                  return AlertDialog(
-                    title: Text(
-                      "Complete your action using..",
-                    ),
-                    actions: [
-                      FlatButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text(
-                          "Cancel",
-                        ),
-                      ),
-                    ],
-                    content: Container(
-                      height: 120,
-                      child: Column(
-                        children: [
-                          ListTile(
-                            leading: Icon(Icons.camera),
-                            title: Text(
-                              "Camera",
-                            ),
-                            onTap: () {
-                              _pickImage(ImageSource.camera);
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          Divider(
-                            height: 1,
-                            color: Colors.black,
-                          ),
-                          ListTile(
-                            leading: Icon(Icons.image),
-                            title: Text(
-                              "Gallery",
-                            ),
-                            onTap: () {
-                              _pickImage(ImageSource.gallery);
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                });
-          },
-          icon: Icon(Icons.add),
-          label: Text(
-            'Add Image',
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            FloatingActionButton(
+              onPressed: getImagefromCamera,
+              heroTag: 'camera',
+              child: Icon(Icons.add_a_photo),
+            ),
+            FloatingActionButton(
+              onPressed: getImagefromGallery,
+              heroTag: 'gallery',
+              child: Icon(Icons.camera_alt),
+            )
+          ],
         )
       ],
     );

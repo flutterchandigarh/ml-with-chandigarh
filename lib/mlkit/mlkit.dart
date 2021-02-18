@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 import 'package:flutter/material.dart';
 import 'package:ml_with_chandigarh/widgets/appBar.dart';
+import 'package:ml_with_chandigarh/widgets/dialog_view.dart';
 import 'package:ml_with_chandigarh/image_picker_class.dart';
 
 class MLKit extends StatefulWidget {
@@ -15,9 +17,73 @@ class MLKit extends StatefulWidget {
 
 class _MLKitState extends State<MLKit> {
   File _userImageFile;
+  List<ImageLabel> _imageLabels = [];
+  List<Barcode> _barCode = [];
+  List<Face> _face = [];
+  var result = "";
 
   void _pickedImage(File image) {
     _userImageFile = image;
+  }
+
+  imageLabelling() async {
+    FirebaseVisionImage myImage = FirebaseVisionImage.fromFile(_userImageFile);
+    ImageLabeler labeler = FirebaseVision.instance.imageLabeler();
+    _imageLabels = await labeler.processImage(myImage);
+    result = "";
+    for (ImageLabel imageLabel in _imageLabels) {
+      setState(() {
+        result = result +
+            imageLabel.text +
+            ":" +
+            imageLabel.confidence.toString() +
+            "\n";
+      });
+    }
+    labeler.close();
+  }
+
+  textRecognition() async {
+    FirebaseVisionImage myImage = FirebaseVisionImage.fromFile(_userImageFile);
+    TextRecognizer recognizeText = FirebaseVision.instance.textRecognizer();
+    VisionText readText = await recognizeText.processImage(myImage);
+    result = "";
+    for (TextBlock block in readText.blocks) {
+      for (TextLine line in block.lines) {
+        setState(() {
+          result = result + ' ' + line.text + '\n';
+        });
+      }
+    }
+    recognizeText.close();
+  }
+
+  barcodeScanner() async {
+    FirebaseVisionImage myImage = FirebaseVisionImage.fromFile(_userImageFile);
+    BarcodeDetector barcodeDetector = FirebaseVision.instance.barcodeDetector();
+    _barCode = await barcodeDetector.detectInImage(myImage);
+    result = "";
+    for (Barcode barcode in _barCode) {
+      setState(() {
+        result = barcode.displayValue;
+      });
+    }
+    print(result);
+    barcodeDetector.close();
+  }
+
+  faceDetection() async {
+    FirebaseVisionImage myImage = FirebaseVisionImage.fromFile(_userImageFile);
+    FaceDetector faceDetector = FirebaseVision.instance.faceDetector();
+    _face = await faceDetector.processImage(myImage);
+    result = "";
+    for (Face face in _face) {
+      setState(() {
+        result = face.boundingBox.toString() + face.headEulerAngleY.toString() + face.headEulerAngleZ.toString();
+      });
+    }
+    print("RESULT: $result");
+    faceDetector.close();
   }
 
   @override
@@ -31,22 +97,51 @@ class _MLKitState extends State<MLKit> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ImagePickerClass(_pickedImage),
+            SizedBox(
+              height: 30,
+            ),
             button(
               text: 'Text Recognition',
-              onPressed: () {},
+              onPressed: () async {
+                textRecognition();
+                await showDialog(
+                  context: context,
+                  builder: (context) =>
+                      DialogView(title: 'Text Recognition', result: result),
+                );
+              },
             ),
             button(
               text: 'Image Labelling',
-              onPressed: () {},
+              onPressed: () async {
+                imageLabelling();
+                await showDialog(
+                  context: context,
+                  builder: (context) =>
+                      DialogView(title: 'Image Labelling', result: result),
+                );
+              },
             ),
             button(
-              text: 'Face Detection',
-              onPressed: () {},
-            ),
+                text: 'Face Detection',
+                onPressed: () async {
+                  faceDetection();
+                  await showDialog(
+                    context: context,
+                    builder: (context) =>
+                        DialogView(title: 'Face Detection', result: result),
+                  );
+                }),
             button(
-              text: 'Barcode Scanning',
-              onPressed: () {},
-            ),
+                text: 'Barcode Scanning',
+                onPressed: () async {
+                  barcodeScanner();
+                  await showDialog(
+                    context: context,
+                    builder: (context) =>
+                        DialogView(title: 'Barcode Scanning', result: result),
+                  );
+                }),
           ],
         ),
       ),
