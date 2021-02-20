@@ -4,7 +4,7 @@ import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 import 'package:flutter/material.dart';
 import 'package:ml_with_chandigarh/widgets/appBar.dart';
 import 'package:ml_with_chandigarh/widgets/dialog_view.dart';
-import 'package:ml_with_chandigarh/image_picker_class.dart';
+import 'package:ml_with_chandigarh/widgets/image_picker_class.dart';
 
 class MLKit extends StatefulWidget {
   final String title;
@@ -40,6 +40,7 @@ class _MLKitState extends State<MLKit> {
             "\n";
       });
     }
+    print("RESULT: $result");
     labeler.close();
   }
 
@@ -55,6 +56,7 @@ class _MLKitState extends State<MLKit> {
         });
       }
     }
+    print("RESULT: $result");
     recognizeText.close();
   }
 
@@ -68,7 +70,7 @@ class _MLKitState extends State<MLKit> {
         result = barcode.displayValue;
       });
     }
-    print(result);
+    print("RESULT: $result");
     barcodeDetector.close();
   }
 
@@ -79,7 +81,9 @@ class _MLKitState extends State<MLKit> {
     result = "";
     for (Face face in _face) {
       setState(() {
-        result = face.boundingBox.toString() + face.headEulerAngleY.toString() + face.headEulerAngleZ.toString();
+        result = face.boundingBox.toString() +
+            face.headEulerAngleY.toString() +
+            face.headEulerAngleZ.toString();
       });
     }
     print("RESULT: $result");
@@ -102,46 +106,41 @@ class _MLKitState extends State<MLKit> {
             ),
             button(
               text: 'Text Recognition',
-              onPressed: () async {
+              onPressed: () {
+                result = "";
+                setState(() {});
                 textRecognition();
-                await showDialog(
-                  context: context,
-                  builder: (context) =>
-                      DialogView(title: 'Text Recognition', result: result),
-                );
               },
             ),
             button(
               text: 'Image Labelling',
-              onPressed: () async {
+              onPressed: () {
+                result = "";
+                setState(() {});
                 imageLabelling();
-                await showDialog(
-                  context: context,
-                  builder: (context) =>
-                      DialogView(title: 'Image Labelling', result: result),
-                );
               },
             ),
             button(
                 text: 'Face Detection',
-                onPressed: () async {
+                onPressed: () {
+                  result = "";
+                  setState(() {});
                   faceDetection();
-                  await showDialog(
-                    context: context,
-                    builder: (context) =>
-                        DialogView(title: 'Face Detection', result: result),
-                  );
                 }),
             button(
                 text: 'Barcode Scanning',
-                onPressed: () async {
+                onPressed: () {
+                  result = "";
+                  setState(() {});
                   barcodeScanner();
-                  await showDialog(
-                    context: context,
-                    builder: (context) =>
-                        DialogView(title: 'Barcode Scanning', result: result),
-                  );
                 }),
+            SizedBox(
+              height: 30,
+            ),
+            Text(
+              'Result: $result',
+              style: TextStyle(color: Colors.black),
+            )
           ],
         ),
       ),
