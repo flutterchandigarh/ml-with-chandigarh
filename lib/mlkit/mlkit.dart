@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 import 'package:flutter/material.dart';
 import 'package:ml_with_chandigarh/widgets/appBar.dart';
-import 'package:ml_with_chandigarh/widgets/dialog_view.dart';
 import 'package:ml_with_chandigarh/widgets/image_picker_class.dart';
 
 class MLKit extends StatefulWidget {
